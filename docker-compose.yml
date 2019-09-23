@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+
+  mongo:
+    image: mongo
+    container_name : mongo
+    restart: always
+    env_file: ./env
+    expose:
+      - "27017"
+    networks:
+      - badass
+
+  server:
+    build: ./server
+    container_name : server
+    env_file: ./env
+    environment:
+      - PORT=80
+      - DB=admin
+      - MONGO_HOST=mongo
+    expose:
+      - "80"
+    ports:
+      - "3000:80"
+    networks:
+      - badass
+    depends_on:
+      - mongo
+    volumes:
+      - ./server:/usr/src/app
+    command: npm run dev
+
+  # client:
+  #   image: willzj/auth_demo_client:latest
+  #   container_name : client
+  #   environment:
+  #     - PORT=80
+  #   expose:
+  #     - "80"
+  #   networks:
+  #     - badass
+  #   depends_on:
+  #     - mongo
+
+networks:
+  badass:
+    driver: bridge
