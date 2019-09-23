@@ -1,21 +1,75 @@
-docker build -t willzj/single_test:latest .
-  docker images
-  docker history
-docker image remove willzj/single_test:latest
+## Summary
+This is a simple demo of how one might write a server leveraging authentication using JSON Web Tokens. It includes a simple server and a mongodb database, which are spun up together using docker-compose.
 
-docker run -p 3000:3000 -e COLOR=blue --name blue willzj/single_test:latest
-docker run --rm -d -p 3000:3000 -e COLOR=blue --name blue willzj/single_test:latest
-  docker ps
-  docker inspect
+## Features
+ - user signup and login  
+ - user passwords are not saved in the database  
+ - authentication using JSON Web Tokens  
+ - example of how to implement granular permissions with user "scopes"  
 
-docker run --rm -d -p 3001:3000 -e COLOR=pink --name green willzj/single_test:latest
-  Inspect. Look at network config.
-  Enter one. Ping the other. Point: it's like microservices
+## Build & Run
+ - Install docker & docker-compose
+ - `git clone https://github.com/willzjacobson/jwt-demo.git`  
+ - `cd jwt-demo`  
+ - `docker-compose build`  
+ - `docker-compose up -d`  
+ - Confirm server and database containers are running: `docker-ps` (should see 2 containers)  
+ - Tail server logs: `docker logs server -f`  
 
-docker run --rm -d -p 3000:3000 -v $(pwd):/usr/src/app -e COLOR=pink -w "/usr/src/app" node:8.11.1-alpine npm run dev
+Since the server is running with `nodemon`, you can edit the source code and the container will restart with your updates when you save the file.  
 
-docker-compose up -d
-  poke around frontend
-  enter frontend and ping backend by name
-  list networks, inspect new one
-docker-compose down
+## Use
+
+### Signup
+`POST /auth/signup`  
+Creates user in mongodb, responds with new user object
+request body:
+```
+{
+  "username": string,
+  "password": string,
+}
+```
+
+### Signin
+`POST /auth/signin`  
+Responds with valid JWT for user
+request body:
+```
+{
+  "username": string,
+  "password": string,
+}
+```
+
+### View Users
+`GET /user`  
+Responds with array of all users in nmongodb  
+NOTE: This would be a highly prtected route in real app. It's included here to ease debugging.  
+
+### GET Resource
+`GET /protected-resource`  
+Responds with "protected information" that only logged in users with the scope 'read:resource' should have access to.  
+To successfully hit this route, must first fetch a token using `auth/signin`, and include it in the `Authorization` request header as shown here.  
+
+request headers:
+```
+{
+  "Authorization": "Bearer <jwt_token>",
+}
+```
+
+### POST Resource
+`POST /protected-resource`  
+Responds with "protected information" that only logged in users with the scope 'write:resource' should have access to.  
+Even if you include a JWT token in the header correctly, you will not be able to hit this route unless you include 'write:resource' in the scope when creating the user with the `/auth/signup` route.  
+
+request headers:
+```
+{
+  "Authorization": "Bearer <jwt_token>",
+}
+```
+
+## Clean up
+ - `docker-compose down`  

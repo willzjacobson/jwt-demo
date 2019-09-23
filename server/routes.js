@@ -24,7 +24,15 @@ router.get('/user', asyncWrapper(async (req, res) => {
 }));
 
 router.post('/auth/signup', asyncWrapper(async (req, res) => {
-		const { username, password } = req.body;
+    const { username, password } = req.body;
+    
+    const user = await User.findOne({ username });
+    if (user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Username taken'
+      });
+    }
 
     // generate salt
     // create hash from plaintext pw + salt, 
@@ -64,6 +72,7 @@ router.post('/auth/signin', asyncWrapper(async (req, res) => {
     }
 
     // Successful login -- generate & send JWT
+    // TODO: add 'exp' to token (expiration time - automatically respected by 'express-jwt' middleware)
     const token = jwt.sign({
       username: user.username,
       user_id: user._id,

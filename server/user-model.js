@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema({
   },
   scope: {
     type: String,
+    // Possible to have multiple scopes like 'read:resource write:resource ...'
     default: 'read:resource'
   },
 });

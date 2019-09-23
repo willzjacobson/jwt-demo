@@ -32,18 +32,6 @@ services:
       - ./server:/usr/src/app
     command: npm run dev
 
-  # client:
-  #   image: willzj/auth_demo_client:latest
-  #   container_name : client
-  #   environment:
-  #     - PORT=80
-  #   expose:
-  #     - "80"
-  #   networks:
-  #     - badass
-  #   depends_on:
-  #     - mongo
-
 networks:
   badass:
     driver: bridge
