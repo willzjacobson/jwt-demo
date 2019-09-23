@@ -18,6 +18,9 @@ This is a simple demo of how one might write a server leveraging authentication 
 
 Since the server is running with `nodemon`, you can edit the source code and the container will restart with your updates when you save the file.  
 
+## Clean up
+ - `docker-compose down`  
+
 ## Use
 
 ### Signup
@@ -44,13 +47,13 @@ request body:
 
 ### View Users
 `GET /user`  
-Responds with array of all users in nmongodb  
+Responds with array of all users in mongodb  
 NOTE: This would be a highly prtected route in real app. It's included here to ease debugging.  
 
 ### GET Resource
 `GET /protected-resource`  
 Responds with "protected information" that only logged in users with the scope 'read:resource' should have access to.  
-To successfully hit this route, must first fetch a token using `auth/signin`, and include it in the `Authorization` request header as shown here.  
+To successfully hit this route, you must first fetch a token using `auth/signin`, and include it in the `Authorization` request header as shown here.  
 
 request headers:
 ```
@@ -61,7 +64,7 @@ request headers:
 
 ### POST Resource
 `POST /protected-resource`  
-Responds with "protected information" that only logged in users with the scope 'write:resource' should have access to.  
+This route would update the "protected information." Only logged in users with the scope 'write:resource' have access to this route.  
 Even if you include a JWT token in the header correctly, you will not be able to hit this route unless you include 'write:resource' in the scope when creating the user with the `/auth/signup` route.  
 
 request headers:
@@ -70,6 +73,3 @@ request headers:
   "Authorization": "Bearer <jwt_token>",
 }
 ```
-
-## Clean up
- - `docker-compose down`  
