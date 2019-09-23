@@ -72,11 +72,12 @@ router.post('/auth/signin', asyncWrapper(async (req, res) => {
     }
 
     // Successful login -- generate & send JWT
-    // TODO: add 'exp' to token (expiration time - automatically respected by 'express-jwt' middleware)
+    // 'exp' : expiration time - automatically respected by 'express-jwt' middleware
     const token = jwt.sign({
       username: user.username,
       user_id: user._id,
       scope: user.scope,
+      exp: Math.round(Date.now() / 1000) + 8 * 60 * 60, // 8 hours from now, measured in seconds after 1970-01-01T00:00:00Z UTC
     }, jwtSecret);
 
     res.status(201).json({ success: true, token});
@@ -89,7 +90,7 @@ router.post('/auth/signin', asyncWrapper(async (req, res) => {
 }));
 
 
-// Here we use the express-jwt middleware to require a jwt in the Authentication header for all routes except the ones specified
+// Here we use the express-jwt middleware to require a jwt in the Authentication header
 // Decode the jwt and try to match the signature using our secret
 // If signatures match, attach the decoded jwt as `req.user`
 // The user should have the scope 'read:resource', so access to this route should be granted
@@ -97,11 +98,19 @@ router.get('/protected-resource',
   expressJwt({ secret: jwtSecret }),
   jwtAuthz([ 'read:resource' ]),
   asyncWrapper(async (req, res) => {
+    console.log('"req.user" is the decoded JWT:', req.user);
+
+    // Lets pretend this route is for fetching financial info specific to this user
+    // To insure we dont give someone's financial info to a user logged in as someone else,
+    // we would confirm that the user's identity (from the JWT) matches the subject of the request
+    // (as specified in the request param/body, etc.)
+
     res.json('Looks like you\'re legit, so here ya go...');
   })
 );
 
 // The user will not have the scope 'write:resource', so access to this route will be denied
+// unless you include that scope in the payload to '/auth/signup`
 router.post('/protected-resource',
   expressJwt({ secret: jwtSecret }),
   jwtAuthz([ 'write:resource' ]),

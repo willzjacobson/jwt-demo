@@ -21,7 +21,7 @@ let serverStarted = false;
 			setTimeout(connectToDB, 3000);
 	});
 
-	// Once connected to DB, define mongood model and start express server
+	// Once connected to DB, define mongoose model and start express server
 	db.once('open', async () => {
 			console.log('Connected to DB, starting server.')
 			if (!serverStarted) {

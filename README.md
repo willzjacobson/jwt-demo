@@ -10,10 +10,11 @@ This is a simple demo of how one might write a server leveraging authentication 
 ## Build & Run
  - Install docker & docker-compose
  - `git clone https://github.com/willzjacobson/jwt-demo.git`  
- - `cd jwt-demo`  
+ - `cd jwt-demo/server`
+ - `npm i` (necessary to install node_modules locally because we are connecting the code to the container via a data volume)  
  - `docker-compose build`  
  - `docker-compose up -d`  
- - Confirm server and database containers are running: `docker-ps` (should see 2 containers)  
+ - Confirm server and database containers are running: `docker-compose ps` (should see 2 containers)  
  - Tail server logs: `docker logs server -f`  
 
 Since the server is running with `nodemon`, you can edit the source code and the container will restart with your updates when you save the file.  
@@ -48,7 +49,7 @@ request body:
 ### View Users
 `GET /user`  
 Responds with array of all users in mongodb  
-NOTE: This would be a highly prtected route in real app. It's included here to ease debugging.  
+NOTE: This would be a highly protected route in real app. It's included here to ease debugging.  
 
 ### GET Resource
 `GET /protected-resource`  
